@@ -9,15 +9,22 @@ public class Character : MonoBehaviour
     protected MoveState nextState;
 
     public MS_Idle idle;
+    public MS_Duck duck;
     public MS_Walk walk;
     public MS_Run run;
     public MS_Dash dash;
     public MS_Skid skid;
     public MS_JumpSquat jumpSquat;
+    public MS_AirJumpSquat airJumpSquat;
     public MS_Jump jump;
+    public MS_Land land;
+
+    [SerializeField] protected MoveStateVars _moveStateVars;
 
     protected Animator _anim;
     protected MovementController _movementController;
+    public MovementController Controller { get => _movementController; }
+
     [SerializeField] protected MovementInputs _movementInputs;
 
     public Vector2 DirectionalInput { get => _movementInputs.Direction; }
@@ -37,6 +44,9 @@ public class Character : MonoBehaviour
             }
         }
     }
+
+    public MovementInputs MovementInputs { get => _movementInputs; }
+    public MoveStateVars MoveStateVars { get => _moveStateVars; }
 
     protected virtual void Start()
     {
@@ -65,4 +75,8 @@ public class Character : MonoBehaviour
         _movementController.DirectionalInput = inputDirection;
     }
 
+    public void SetJump(float jumpVelocity)
+    {
+        _movementController.JumpVelocity = jumpVelocity;
+    }
 }

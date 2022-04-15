@@ -210,6 +210,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1d1f13d4c3a12143a045908cb574372, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _moveStateVars:
+    walkspeed: 2
+    runspeed: 5
+    fullHopVelocity: 15
+    shortHopVelocity: 10
+    airHopVelocity: 15
+    airJumps: 1
   _movementInputs:
     Direction: {x: 0, y: 0}
     Jump: 0
