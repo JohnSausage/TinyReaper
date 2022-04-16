@@ -472,16 +472,18 @@ namespace MoveStates
         {
         }
 
-        public override void Enter()
-        {
-            base.Enter();
-
-            Anim("idle");
-        }
-
         public override void Execute()
         {
             base.Execute();
+
+            if(Ctr.OutputVelocity.y > 0f)
+            {
+                Anim("jumpUp");
+            }
+            else
+            {
+                Anim("jumpDown");
+            }
 
             if(_timerF < 3 && (_chr.LastState == Vars.JumpSquat))
             {
