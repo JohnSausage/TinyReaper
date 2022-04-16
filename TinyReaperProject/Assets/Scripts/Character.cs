@@ -7,17 +7,8 @@ public class Character : MonoBehaviour
 {
     protected MoveState currentState;
     protected MoveState nextState;
+    public MoveState LastState { get; protected set; }
 
-    public MS_Idle idle;
-    public MS_Duck duck;
-    public MS_Walk walk;
-    public MS_Run run;
-    public MS_Dash dash;
-    public MS_Skid skid;
-    public MS_JumpSquat jumpSquat;
-    public MS_AirJumpSquat airJumpSquat;
-    public MS_Jump jump;
-    public MS_Land land;
 
     [SerializeField] protected MoveStateVars _moveStateVars;
 
@@ -70,12 +61,12 @@ public class Character : MonoBehaviour
         this.nextState = nextState;
     }
 
-    public void SetInputDirection(Vector2 inputDirection)
+    public void SetInputVelocity(Vector2 inputDirection)
     {
-        _movementController.DirectionalInput = inputDirection;
+        _movementController.InputVelocity = inputDirection;
     }
 
-    public void SetJump(float jumpVelocity)
+    public void SetJumpVelocity(float jumpVelocity)
     {
         _movementController.JumpVelocity = jumpVelocity;
     }

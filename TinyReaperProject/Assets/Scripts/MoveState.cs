@@ -6,21 +6,71 @@ namespace MoveStates
     [System.Serializable]
     public class MoveStateVars
     {
-        public float walkspeed = 2;
-        public float runspeed = 5;
+        public float walkspeed = 8;
+        public float runspeed = 15;
         public float fullHopVelocity = 12;
         public float shortHopVelocity = 8;
         public float airHopVelocity = 10;
+        public float maxAirspeed = 20;
+        public float aerialAccel = 2;
+        public float aerialDeaccel = 1;
 
+        [Space]
+
+        public float dashSpeed = 20;
+        public int dashTimeF = 5;
+        public int skidTimeF = 3;
         public int airJumps = 1;
         public int AirJumpCounter { get; set; }
+        public float DashDirection { get; set; }
+        public float SkidDirection { get; set; }
+        public float JumpSquatDirection { get; set; }
+
+        [Space]
+
+        //States
+        [SerializeField] private MS_Idle idle;
+        [SerializeField] private MS_Duck duck;
+        [SerializeField] private MS_Walk walk;
+        [SerializeField] private MS_Run run;
+        [SerializeField] private MS_Dash dash;
+        [SerializeField] private MS_Skid skid;
+        [SerializeField] private MS_JumpSquat jumpSquat;
+        [SerializeField] private MS_AirJumpSquat airJumpSquat;
+        [SerializeField] private MS_Jump jump;
+        [SerializeField] private MS_Land land;
+
+        public MS_Idle Idle { get => idle; }
+        public MS_Duck Duck { get => duck; }
+        public MS_Walk Walk { get => walk; }
+        public MS_Run Run { get => run; }
+        public MS_Dash Dash { get => dash; }
+        public MS_Skid Skid { get => skid; }
+        public MS_JumpSquat JumpSquat { get => jumpSquat; }
+        public MS_AirJumpSquat AirJumpSquat { get => airJumpSquat; }
+        public MS_Jump Jump { get => jump; }
+        public MS_Land Land { get => land; }
+
+        public void InitStates(Character chr)
+        {
+            idle = new MS_Idle(chr);
+            duck = new MS_Duck(chr);
+            walk = new MS_Walk(chr);
+            run = new MS_Run(chr);
+            dash = new MS_Dash(chr);
+            skid = new MS_Skid(chr);
+            jumpSquat = new MS_JumpSquat(chr);
+            airJumpSquat = new MS_AirJumpSquat(chr);
+            jump = new MS_Jump(chr);
+            land = new MS_Land(chr);
+        }
     }
 
     [System.Serializable]
     public class MoveState
     {
         protected Character _chr;
-        protected int _timer;
+        protected int _timerF;
 
         protected MoveStateVars Vars { get => _chr.MoveStateVars; }
         protected MovementInputs Inputs { get => _chr.MovementInputs; }
@@ -33,12 +83,12 @@ namespace MoveStates
 
         public virtual void Enter()
         {
-            _timer = 0;
+            _timerF = 0;
         }
 
         public virtual void Execute()
         {
-            _timer++;
+            _timerF++;
         }
 
         public virtual void Exit()
@@ -56,24 +106,46 @@ namespace MoveStates
             _chr.SetNextState(nextState);
         }
 
-        protected void InputX(float inputX)
+        protected void SetVelocityX(float inputX)
         {
-            _chr.SetInputDirection(new Vector2(inputX, 0));
+            _chr.SetInputVelocity(new Vector2(inputX, 0));
         }
 
         protected void CheckForJump()
         {
             if (_chr.MovementInputs.JumpEvent == true)
             {
-                Next(_chr.jumpSquat);
+                Next(Vars.JumpSquat);
             }
         }
 
         protected void CheckIfAerial()
         {
-            if(Ctr.IsGrounded == false)
+            if (Ctr.IsGrounded == false)
             {
-                Next(_chr.jump);
+                Next(Vars.Jump);
+            }
+        }
+
+        protected void CheckForDash()
+        {
+            if (Inputs.StrongDirection.x != 0)
+            {
+                Vars.DashDirection = Inputs.StrongDirection.x;
+                Next(Vars.Dash);
+                _chr.AnimDir = Vars.DashDirection;
+            }
+        }
+
+        protected void CheckFallThroughPlatform()
+        {
+            if(Inputs.Direction.y < -0.90f)
+            {
+                Ctr.FallThroughPlatforms = true;
+            }
+            else
+            {
+                Ctr.FallThroughPlatforms = false;
             }
         }
     }
@@ -91,23 +163,32 @@ namespace MoveStates
             Anim("idle");
 
             Vars.AirJumpCounter = 0;
+            Vars.SkidDirection = 0;
         }
 
         public override void Execute()
         {
             base.Execute();
 
-            if (_chr.DirectionalInput.y < -0.5f)
+            SetVelocityX(0f);
+
+            if (_timerF > 3)
             {
-                Next(_chr.duck);
+                if (_chr.DirectionalInput.y < -0.5f)
+                {
+                    Next(Vars.Duck);
+                }
+
+                if (Mathf.Abs(Inputs.Direction.x) > 0.45f)
+                {
+                    _chr.AnimDir = _chr.DirectionalInput.x;
+                    Next(Vars.Walk);
+                }
+
+                CheckForDash();
             }
 
-            if (Inputs.Direction.x != 0)
-            {
-                _chr.AnimDir = _chr.DirectionalInput.x;
-                Next(_chr.walk);
-            }
-
+            CheckFallThroughPlatform();
             CheckIfAerial();
             CheckForJump();
         }
@@ -124,6 +205,8 @@ namespace MoveStates
             base.Enter();
 
             Anim("duck");
+
+            Vars.SkidDirection = 0;
         }
 
         public override void Execute()
@@ -132,15 +215,17 @@ namespace MoveStates
 
             if (_chr.DirectionalInput.y > -0.5f)
             {
-                Next(_chr.idle);
+                Next(Vars.Idle);
             }
 
-            if (_chr.DirectionalInput.x != 0)
+            if (Mathf.Abs(Inputs.Direction.x) > 0.45f)
             {
                 _chr.AnimDir = _chr.DirectionalInput.x;
-                Next(_chr.walk);
+                Next(Vars.Walk);
             }
 
+            CheckForDash();
+            CheckFallThroughPlatform();
             CheckIfAerial();
             CheckForJump();
         }
@@ -157,17 +242,28 @@ namespace MoveStates
             base.Enter();
 
             Anim("run");
+
+            Vars.SkidDirection = 0;
         }
 
         public override void Execute()
         {
             base.Execute();
 
-            if (_chr.DirectionalInput.x == 0)
+            SetVelocityX(Inputs.Direction.x * Vars.walkspeed);
+            _chr.AnimDir = Inputs.Direction.x;
+
+            if (Mathf.Abs(Inputs.Direction.x) < 0.25f)
             {
-                Next(_chr.idle);
+                Next(Vars.Idle);
             }
 
+            if (Mathf.Abs(Inputs.Direction.x) > 0.75f)
+            {
+                Next(Vars.Run);
+            }
+
+            CheckFallThroughPlatform();
             CheckIfAerial();
             CheckForJump();
         }
@@ -190,6 +286,19 @@ namespace MoveStates
         {
             base.Execute();
 
+            SetVelocityX(Inputs.Direction.x * Vars.runspeed);
+
+            if (Mathf.Abs(Inputs.Direction.x) < 0.25f)
+            {
+                Next(Vars.Skid);
+            }
+
+            if (Mathf.Sign(Inputs.Direction.x) != Mathf.Sign(_chr.AnimDir) && Mathf.Abs(Inputs.Direction.x) > 0.5f)
+            {
+                Next(Vars.Skid);
+            }
+
+            CheckFallThroughPlatform();
             CheckIfAerial();
             CheckForJump();
         }
@@ -200,12 +309,82 @@ namespace MoveStates
         public MS_Dash(Character chr) : base(chr)
         {
         }
+
+        public override void Enter()
+        {
+            base.Enter();
+
+            Anim("idle");
+        }
+
+        public override void Execute()
+        {
+            base.Execute();
+
+            if (_timerF < 3)
+            {
+                SetVelocityX(0);
+            }
+            else
+            {
+                SetVelocityX(Mathf.Sign(Vars.DashDirection) * Vars.dashSpeed);
+            }
+
+            if (_timerF > Vars.dashTimeF)
+            {
+                if (Mathf.Abs(Inputs.Direction.x) < 0.25f)
+                {
+                    Next(Vars.Skid);
+                }
+                else
+                {
+                    Next(Vars.Run);
+                }
+            }
+
+            CheckIfAerial();
+            CheckForJump();
+        }
     }
 
     public class MS_Skid : MoveState
     {
+        private bool _directionChanged;
         public MS_Skid(Character chr) : base(chr)
         {
+        }
+
+        public override void Enter()
+        {
+            base.Enter();
+
+            Vars.SkidDirection = _chr.AnimDir;
+            _directionChanged = false;
+        }
+
+        public override void Execute()
+        {
+            base.Execute();
+
+            SetVelocityX(Mathf.Sign(Vars.SkidDirection) * Vars.walkspeed);
+
+            if (_directionChanged == false)
+            {
+                if (Mathf.Sign(Inputs.Direction.x) != Mathf.Sign(Vars.SkidDirection) && Mathf.Abs(Inputs.Direction.x) > 0.5f)
+                {
+                    _chr.AnimDir = -_chr.AnimDir;
+                    _directionChanged = true;
+                }
+            }
+
+            if (_timerF > Vars.skidTimeF)
+            {
+                Next(Vars.Idle);
+            }
+
+            CheckFallThroughPlatform();
+            CheckIfAerial();
+            CheckForJump();
         }
     }
 
@@ -220,24 +399,38 @@ namespace MoveStates
             base.Enter();
 
             Anim("duck");
+
+            Vars.JumpSquatDirection = Inputs.Direction.x;
+
+            if (_chr.LastState == Vars.Skid)
+            {
+                Vars.JumpSquatDirection = Vars.SkidDirection * 0.25f;
+            }
+
+            if (_chr.LastState == Vars.Run)
+            {
+                Vars.JumpSquatDirection = _chr.AnimDir;
+            }
         }
 
         public override void Execute()
         {
             base.Execute();
 
-            Inputs.Direction = Vector2.zero;
+            SetVelocityX(Vars.JumpSquatDirection * Vars.walkspeed);
 
-            if (_timer > 3)
+            if (_timerF > 3)
             {
-                Next(_chr.jump);
+                Next(Vars.Jump);
                 if (_chr.MovementInputs.Jump == true)
                 {
-                    _chr.SetJump(_chr.MoveStateVars.fullHopVelocity);
+                    SetVelocityX(Vars.JumpSquatDirection * Vars.runspeed);
+                    _chr.SetJumpVelocity(_chr.MoveStateVars.fullHopVelocity);
                 }
                 else
                 {
-                    _chr.SetJump(_chr.MoveStateVars.shortHopVelocity);
+                    SetVelocityX(Vars.JumpSquatDirection * Vars.runspeed);
+                    _chr.SetJumpVelocity(_chr.MoveStateVars.shortHopVelocity);
                 }
             }
         }
@@ -254,6 +447,8 @@ namespace MoveStates
             base.Enter();
 
             Anim("duck");
+
+            Vars.JumpSquatDirection = Inputs.Direction.x;
         }
 
         public override void Execute()
@@ -262,11 +457,11 @@ namespace MoveStates
 
             Inputs.Direction = Vector2.zero;
 
-            if (_timer > 3)
+            if (_timerF > 3)
             {
-                Next(_chr.jump);
+                Next(Vars.Jump);
 
-                _chr.SetJump(_chr.MoveStateVars.airHopVelocity);
+                _chr.SetJumpVelocity(_chr.MoveStateVars.airHopVelocity);
             }
         }
     }
@@ -288,15 +483,73 @@ namespace MoveStates
         {
             base.Execute();
 
-            if (Inputs.JumpEvent && Vars.AirJumpCounter < Vars.airJumps)
+            if(_timerF < 3 && (_chr.LastState == Vars.JumpSquat))
             {
-                Vars.AirJumpCounter++;
-                Next(_chr.airJumpSquat);
+                if(Mathf.Abs(Inputs.Direction.x) <= 0.5f)
+                {
+                    SetVelocityX(Vars.JumpSquatDirection * Vars.maxAirspeed / 2f);
+                }
+                else
+                {
+                    SetVelocityX(Inputs.Direction.x * Vars.maxAirspeed / 1.5f);
+                }
             }
+            else if (_timerF < 3 && _chr.LastState == Vars.AirJumpSquat)
+            {
+                if (Mathf.Abs(Inputs.Direction.x) <= 0.5f)
+                {
+                    SetVelocityX(0);
+                }
+                else
+                {
+                    SetVelocityX(Inputs.Direction.x * Vars.maxAirspeed / 2f);
+                }
+            }
+            else
+            {
+                float nextVelocity = Ctr.OutputVelocity.x;
+                float inputX = Inputs.Direction.x;
+                if (Mathf.Abs(inputX) < 0.25f)
+                {
+                    inputX = 0;
+                }
+
+                if (inputX == 0)
+                {
+                    if (Mathf.Abs(nextVelocity) <= Vars.aerialDeaccel)
+                    {
+                        nextVelocity = 0f;
+                    }
+                    else
+                    {
+                        nextVelocity -= (Vars.aerialDeaccel * Mathf.Sign(nextVelocity));
+                    }
+                }
+                else
+                {
+                    nextVelocity += inputX * Vars.aerialAccel;
+                }
+
+                nextVelocity = Mathf.Clamp(nextVelocity, -Vars.maxAirspeed, Vars.maxAirspeed);
+
+                SetVelocityX(nextVelocity);
+                if (Inputs.JumpEvent && Vars.AirJumpCounter < Vars.airJumps)
+                {
+                    Vars.AirJumpCounter++;
+                    Next(Vars.AirJumpSquat);
+                }
+            }
+
+            if(Inputs.Direction.y < -0.5f && Ctr.OutputVelocity.y < 0f)
+            {
+                Ctr.fastFall = true;
+            }
+
+            CheckFallThroughPlatform();
 
             if (_chr.Controller.IsGrounded == true)
             {
-                Next(_chr.land);
+                Next(Vars.Land);
             }
         }
     }
@@ -312,6 +565,7 @@ namespace MoveStates
             base.Enter();
 
             Vars.AirJumpCounter = 0;
+            Vars.SkidDirection = 0;
 
             Anim("duck");
         }
@@ -320,17 +574,30 @@ namespace MoveStates
         {
             base.Execute();
 
-            if (_timer > 3)
+            if (_timerF > 3)
             {
-                Next(_chr.idle);
-
-                if(Inputs.Jump)
+                if (Mathf.Abs(Inputs.Direction.x) <= 0.25f)
                 {
-                    Next(_chr.jumpSquat);
+                    Next(Vars.Idle);
+                }
+                else if (Mathf.Abs(Inputs.Direction.x) <= 0.75f)
+                {
+                    Next(Vars.Walk);
+                    _chr.AnimDir = Inputs.Direction.x;
+                }
+                else
+                {
+                    Next(Vars.Run);
+                    _chr.AnimDir = Inputs.Direction.x;
+                }
+
+                if (Inputs.Jump)
+                {
+                    Next(Vars.JumpSquat);
                 }
             }
 
-            Inputs.Direction = Vector2.zero;
+            SetVelocityX(Inputs.Direction.x * Vars.walkspeed);
         }
     }
 }

@@ -6,10 +6,13 @@ using MoveStates;
 
 public class Player : Character
 {
+    [SerializeField] private string _stateName;
+
     private PlayerInput _playerInput;
     private PlayerInputActions _playerInputActions;
 
     private bool oldJump;
+    private Vector2 oldDirection;
 
     protected override void Start()
     {
@@ -19,39 +22,51 @@ public class Player : Character
         _playerInputActions = new PlayerInputActions();
         _playerInputActions.Enable();
 
-        idle = new MS_Idle(this);
-        duck = new MS_Duck(this);
-        walk = new MS_Walk(this);
-        run = new MS_Run(this);
-        dash = new MS_Dash(this);
-        skid = new MS_Skid(this);
-        jumpSquat = new MS_JumpSquat(this);
-        airJumpSquat = new MS_AirJumpSquat(this);
-        jump = new MS_Jump(this);
-        land = new MS_Land(this);
+        MoveStateVars.InitStates(this);
 
-        currentState = idle;
+        currentState = MoveStateVars.Idle;
         currentState.Enter();
-        nextState = idle;
+        nextState = MoveStateVars.Idle;
     }
 
     protected override void FixedUpdate()
     {
         GetInputs();
 
-        _movementController.DirectionalInput = _movementInputs.Direction;
+        //_movementController.InputVelocity = _movementInputs.Direction;
 
         _movementInputs.JumpEvent = false;
+
         if (_movementInputs.Jump == true && oldJump == false)
         {
             _movementInputs.JumpEvent = true;
         }
 
-        if(currentState != nextState)
+        Vector2 direction = _movementInputs.Direction;
+        Vector2 strongDirection = Vector2.zero;
+
+        if((Mathf.Abs( direction.x -oldDirection.x) > 0.25f) && Mathf.Abs(direction.x) > 0.8f)
+        {
+            strongDirection.x = Mathf.Sign(direction.x);
+        }
+        
+        if ((Mathf.Abs(direction.y - oldDirection.y) > 0.25f) && Mathf.Abs(direction.y) > 0.8f)
+        {
+            strongDirection.y = Mathf.Sign(direction.y);
+        }
+
+        _movementInputs.StrongDirection = strongDirection;
+
+        if (currentState != nextState)
         {
             currentState.Exit();
+            LastState = currentState;
             currentState = nextState;
             currentState.Enter();
+
+            _stateName = currentState.ToString();
+
+            Debug.Log(_stateName);
         }
 
         currentState.Execute();
@@ -59,6 +74,7 @@ public class Player : Character
         base.FixedUpdate();
 
         oldJump = _movementInputs.Jump;
+        oldDirection = _movementInputs.Direction;
     }
 
     private void GetInputs()

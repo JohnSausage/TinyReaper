@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class MovementController : MonoBehaviour
 {
-    public Vector2 DirectionalInput;
-    protected Vector2 LastDirectionalInput;
+    public Vector2 InputVelocity;
+    protected Vector2 lastInputVelocity;
 
     public Vector2 velocity;// { get { return velocity; } }
+    public Vector2 OutputVelocity { get => velocity * 60; }
     protected Vector2 oldVelocity;
 
     public Vector2 Position { get { return transform.TransformPoint(col.offset); } }
@@ -133,7 +134,7 @@ public class MovementController : MonoBehaviour
         transform.Translate(velocity);
 
         WasGrounded = IsGrounded;
-        LastDirectionalInput = DirectionalInput;
+        lastInputVelocity = InputVelocity;
     }
 
     public enum EGroundMoveState { None, Idle, Moving, SlopeUp, SlopeDown };
@@ -170,7 +171,7 @@ public class MovementController : MonoBehaviour
 
         if (IsGrounded == true)
         {
-            if (DirectionalInput.x == 0)
+            if (InputVelocity.x == 0)
             {
                 moveState = EGroundMoveState.Idle;
             }
@@ -188,7 +189,7 @@ public class MovementController : MonoBehaviour
 
                         ApplyAddMovementToVelocity();
 
-                        if (DirectionalInput.x != 0)
+                        if (InputVelocity.x != 0)
                         {
                             CheckForSlopeDown();
 
@@ -213,7 +214,7 @@ public class MovementController : MonoBehaviour
 
                         //normal sideways movement
                         velocity.y = 0;
-                        velocity.x = DirectionalInput.x * Movespeed / 60;
+                        velocity.x = InputVelocity.x * Movespeed / 60;
 
                         ApplyAddMovementToVelocity();
 
@@ -251,8 +252,8 @@ public class MovementController : MonoBehaviour
                 case EGroundMoveState.SlopeUp:
                     {
                         //moving slope up
-                        velocity = new Vector2(Mathf.Sign(DirectionalInput.x) * Mathf.Cos(Mathf.Deg2Rad * movingSlopeUpAngle), Mathf.Sin(Mathf.Deg2Rad * movingSlopeUpAngle)).normalized / 60 * Movespeed;
-                        velocity *= Mathf.Abs(DirectionalInput.x);
+                        velocity = new Vector2(Mathf.Sign(InputVelocity.x) * Mathf.Cos(Mathf.Deg2Rad * movingSlopeUpAngle), Mathf.Sin(Mathf.Deg2Rad * movingSlopeUpAngle)).normalized / 60 * Movespeed;
+                        velocity *= Mathf.Abs(InputVelocity.x);
 
                         ApplyAddMovementToVelocity();
 
@@ -302,8 +303,8 @@ public class MovementController : MonoBehaviour
 
                 case EGroundMoveState.SlopeDown:
                     {
-                        velocity = new Vector2(Mathf.Sign(DirectionalInput.x) * Mathf.Cos(Mathf.Deg2Rad * movingSlopeDownAngle), -Mathf.Sin(Mathf.Deg2Rad * movingSlopeDownAngle)).normalized / 60 * Movespeed;
-                        velocity *= Mathf.Abs(DirectionalInput.x);
+                        velocity = new Vector2(Mathf.Sign(InputVelocity.x) * Mathf.Cos(Mathf.Deg2Rad * movingSlopeDownAngle), -Mathf.Sin(Mathf.Deg2Rad * movingSlopeDownAngle)).normalized / 60 * Movespeed;
+                        velocity *= Mathf.Abs(InputVelocity.x);
 
                         ApplyAddMovementToVelocity();
 
@@ -419,9 +420,9 @@ public class MovementController : MonoBehaviour
     {
         bool retVal = false;
 
-        if (DirectionalInput.x != 0)
+        if (InputVelocity.x != 0)
         {
-            if (Mathf.Sign(DirectionalInput.x) != Mathf.Sign(LastDirectionalInput.x))
+            if (Mathf.Sign(InputVelocity.x) != Mathf.Sign(lastInputVelocity.x))
             {
                 retVal = true;
             }
@@ -497,7 +498,7 @@ public class MovementController : MonoBehaviour
         else
         { //faster than fastfallspeed
             //increase or decrease fallspeed woth di;
-            velocity.y += DirectionalInput.y * DIStrength / 60 * aerialAcceleration;
+            velocity.y += InputVelocity.y * DIStrength / 60 * aerialAcceleration;
         }
     }
 
@@ -518,16 +519,16 @@ public class MovementController : MonoBehaviour
 
     public bool CheckForOnWall()
     {
-        RaycastHit2D onWallCheck = RayCastXY(Vector2.right * Mathf.Sign(DirectionalInput.x), Mathf.Abs(velocity.x) + skin, collisionMask);
+        RaycastHit2D onWallCheck = RayCastXY(Vector2.right * Mathf.Sign(InputVelocity.x), Mathf.Abs(velocity.x) + skin, collisionMask);
 
         if (onWallCheck)
         {
             OnWall = true;
             OnWallTimed = true;
             onWallTimer = 3;
-            WallDirection = (int)Mathf.Sign(DirectionalInput.x);
+            WallDirection = (int)Mathf.Sign(InputVelocity.x);
 
-            velocity.x = (onWallCheck.distance - skin) * Mathf.Sign(DirectionalInput.x);
+            velocity.x = (onWallCheck.distance - skin) * Mathf.Sign(InputVelocity.x);
 
             if (velocity.y < -WallslideSpeed / 60f)
             {
@@ -540,7 +541,7 @@ public class MovementController : MonoBehaviour
 
     public bool CheckForOnLedge()
     {
-        RaycastHit2D ledgeCheck = RayCastLine(Vector2.down, 0.75f + skin, (Vector2)bounds.center + new Vector2(bounds.extents.x * Mathf.Sign(DirectionalInput.x), -bounds.extents.y), groundMask);
+        RaycastHit2D ledgeCheck = RayCastLine(Vector2.down, 0.75f + skin, (Vector2)bounds.center + new Vector2(bounds.extents.x * Mathf.Sign(InputVelocity.x), -bounds.extents.y), groundMask);
 
         if (ledgeCheck)
         {
@@ -635,7 +636,7 @@ public class MovementController : MonoBehaviour
 
     public bool CheckForSlopeUp()
     {
-        RaycastHit2D slopeUpCheck = RayCastLine(velocity, velocity.magnitude + skin, (Vector2)bounds.center + new Vector2(bounds.extents.x * Mathf.Sign(DirectionalInput.x), -bounds.extents.y), groundMask);
+        RaycastHit2D slopeUpCheck = RayCastLine(velocity, velocity.magnitude + skin, (Vector2)bounds.center + new Vector2(bounds.extents.x * Mathf.Sign(InputVelocity.x), -bounds.extents.y), groundMask);
 
         if (slopeUpCheck)
         {
@@ -668,7 +669,7 @@ public class MovementController : MonoBehaviour
 
     public bool CheckForSlopeDown()
     {
-        RaycastHit2D slopeDownCheck = RayCastLine(Vector2.down, skin * 2, (Vector2)bounds.center + new Vector2(-bounds.extents.x * Mathf.Sign(DirectionalInput.x), -bounds.extents.y), groundMask);
+        RaycastHit2D slopeDownCheck = RayCastLine(Vector2.down, skin * 2, (Vector2)bounds.center + new Vector2(-bounds.extents.x * Mathf.Sign(InputVelocity.x), -bounds.extents.y), groundMask);
 
         if (slopeDownCheck)
         {
@@ -799,18 +800,19 @@ public class MovementController : MonoBehaviour
 
     public void CalculateAerialVelocityX()
     {
-        float dirX = Mathf.Sign(velocity.x);
-        velocity.x -= Airspeed / 60 * aerialDeceleration * Mathf.Sign(velocity.x);
+        //float dirX = Mathf.Sign(velocity.x);
+        //velocity.x -= Airspeed / 60 * aerialDeceleration * Mathf.Sign(velocity.x);
 
-        if (dirX != Mathf.Sign(velocity.x))
-        {
-            velocity.x = 0;
-        }
+        //if (dirX != Mathf.Sign(velocity.x))
+        //{
+        //    velocity.x = 0;
+        //}
 
-        velocity.x += DirectionalInput.x * Airspeed / 60 * aerialAcceleration;
+        //velocity.x += InputVelocity.x * Airspeed / 60 * aerialAcceleration;
 
-        velocity.x = Mathf.Clamp(velocity.x, -Airspeed / 60, Airspeed / 60);
+        //velocity.x = Mathf.Clamp(velocity.x, -Airspeed / 60, Airspeed / 60);
 
+        velocity.x = InputVelocity.x / 60;
 
         if (canFly == true)
         {
@@ -818,10 +820,9 @@ public class MovementController : MonoBehaviour
 
             velocity.y -= Airspeed / 60 * aerialDeceleration * Mathf.Sign(velocity.y);
 
-            velocity.y += DirectionalInput.y * Airspeed / 60 * aerialAcceleration;
+            velocity.y += InputVelocity.y * Airspeed / 60 * aerialAcceleration;
 
             velocity.y = Mathf.Clamp(velocity.y, -Airspeed / 60, Airspeed / 60);
-
         }
     }
 
@@ -840,7 +841,7 @@ public class MovementController : MonoBehaviour
 
 
         //allow DI away only if slower than maxairspeed
-        float velXAfterDI = velocity.x + DirectionalInput.x * DIStrength / 60 * aerialAcceleration;
+        float velXAfterDI = velocity.x + InputVelocity.x * DIStrength / 60 * aerialAcceleration;
 
         if (Mathf.Abs(velXAfterDI) <= maxAerialSpeed)
         {
@@ -850,7 +851,7 @@ public class MovementController : MonoBehaviour
         //allow vectoring away only if slower than maxairspeed
         if (velocity.y > 0)
         {
-            Vector2 velAfterVectoring = velocity.normalized * (velocity.magnitude + DirectionalInput.y * DIStrength / 60 * aerialAcceleration);
+            Vector2 velAfterVectoring = velocity.normalized * (velocity.magnitude + InputVelocity.y * DIStrength / 60 * aerialAcceleration);
 
             if (Mathf.Abs(velAfterVectoring.x) <= maxAerialSpeed)
             {
@@ -859,119 +860,6 @@ public class MovementController : MonoBehaviour
 
             velocity.y = velAfterVectoring.y;
         }
-
-        //[SerializeField] private LayerMask _ground;
-
-        //[Space]
-
-        //[SerializeField] private Vector2 _velocity;
-        //public Vector2 Velocity { get => _velocity; }
-        //public Vector2 InputVelocity { get; set; }
-
-        //[SerializeField] private bool _grounded;
-        //public bool Grounded { get => _grounded; }
-
-        //[SerializeField] private bool _hasContact;
-
-        //[Space]
-
-        //[SerializeField] private float _skin = 0.02f;
-
-        //[SerializeField] private float _gravity = 1;
-        //public float Gravity { get => _gravity; set => _gravity = value; }
-
-        //[SerializeField] private float _movespeed = 5f;
-        //public float Movespeed { get => _movespeed; set => _movespeed = value; }
-
-
-        //private BoxCollider2D _col;
-        //private Bounds _bounds;
-
-        //private void Start()
-        //{
-        //    _col = GetComponent<BoxCollider2D>();
-        //}
-
-        //public void UpdatePositionFixed()
-        //{
-        //    _bounds = _col.bounds;
-        //    _bounds.Expand(-2 * _skin);
-
-        //    GroundCheck();
-
-        //    _hasContact = Physics2D.BoxCast(_col.bounds.center, _col.bounds.size, 0, Vector2.zero, 0, _ground);
-
-
-
-        //    if (_hasContact == false)
-        //    {
-        //        //apply gravity
-        //        _velocity += Vector2.down * _gravity / 60f;
-
-        //        //check if will collide
-        //        RaycastHit2D willCollide = Physics2D.BoxCast(_col.bounds.center, _col.bounds.size, 0, _velocity, _velocity.magnitude, _ground);
-
-        //        //limit distance to not phase through object
-        //        if (willCollide)
-        //        {
-        //            _velocity = _velocity.normalized * willCollide.distance;
-        //        }
-        //    }
-
-        //    if (_hasContact == true)
-        //    {
-        //        if (_grounded)
-        //        {
-        //            _velocity.y = 0;
-
-        //            //set desired velocity
-        //            _velocity.x = InputVelocity.x / 60f * _movespeed;
-
-        //            //check for sideways collisions
-
-        //            RaycastHit2D sideCheck = Physics2D.BoxCast(_bounds.center, _bounds.size, 0, _velocity, _velocity.magnitude + _skin, _ground);
-
-        //            if (sideCheck)
-        //            {
-        //                _velocity = _velocity.normalized * (sideCheck.distance - HitDistance(sideCheck));
-        //            }
-        //        }
-        //    }
-
-
-
-        //    transform.Translate(_velocity);
-        //}
-
-        //private void GroundCheck()
-        //{
-        //    Vector2 origin = (Vector2)_col.bounds.center + Vector2.down * _col.bounds.extents.y;
-        //    Vector2 size = new Vector2(_col.bounds.size.x - _skin * 2f, _skin);
-
-        //    _grounded = Physics2D.BoxCast(origin, size, 0, Vector2.down, _skin, _ground);
-        //}
-
-        //public float HitDistance(RaycastHit2D collision)
-        //{
-        //    Vector2 hitDirection;
-
-        //    hitDirection = (Vector2)_bounds.center - collision.point;
-        //    hitDirection = new Vector2(Mathf.Sign(hitDirection.x), Mathf.Sign(hitDirection.y));
-
-        //    float gamma = Mathf.Abs(90 - Vector2.Angle(collision.normal, hitDirection));
-        //    float alpha = Mathf.Abs(90 - Vector2.Angle(collision.normal, _velocity));
-
-        //    float triangleDistance = _skin;
-
-        //    triangleDistance = _skin * Mathf.Sqrt(2) * Mathf.Sin(gamma * Mathf.Deg2Rad) / Mathf.Sin(alpha * Mathf.Deg2Rad);
-
-        //    float moveDistance = (collision.distance - triangleDistance);
-
-        //    //to stop backwards movemenet
-        //    if (moveDistance < 0) moveDistance = 0;
-
-        //    return moveDistance;
-        //}
     }
 
 
