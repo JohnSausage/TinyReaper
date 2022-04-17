@@ -9,4 +9,6 @@ public class MovementInputs
     public Vector2 StrongDirection { get; set; }
     public bool Jump;// { get; set; }
     public bool JumpEvent { get; set; }
+
+    public bool Shield { get; set; }
 }

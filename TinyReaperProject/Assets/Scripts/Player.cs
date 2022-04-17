@@ -33,29 +33,6 @@ public class Player : Character
     {
         GetInputs();
 
-        //_movementController.InputVelocity = _movementInputs.Direction;
-
-        _movementInputs.JumpEvent = false;
-
-        if (_movementInputs.Jump == true && oldJump == false)
-        {
-            _movementInputs.JumpEvent = true;
-        }
-
-        Vector2 direction = _movementInputs.Direction;
-        Vector2 strongDirection = Vector2.zero;
-
-        if((Mathf.Abs( direction.x -oldDirection.x) > 0.25f) && Mathf.Abs(direction.x) > 0.8f)
-        {
-            strongDirection.x = Mathf.Sign(direction.x);
-        }
-        
-        if ((Mathf.Abs(direction.y - oldDirection.y) > 0.25f) && Mathf.Abs(direction.y) > 0.8f)
-        {
-            strongDirection.y = Mathf.Sign(direction.y);
-        }
-
-        _movementInputs.StrongDirection = strongDirection;
 
         if (currentState != nextState)
         {
@@ -73,13 +50,37 @@ public class Player : Character
 
         base.FixedUpdate();
 
-        oldJump = _movementInputs.Jump;
-        oldDirection = _movementInputs.Direction;
     }
 
     private void GetInputs()
     {
         _movementInputs.Direction = _playerInputActions.PlayerMovement.Move.ReadValue<Vector2>();
         _movementInputs.Jump = _playerInputActions.PlayerMovement.Jump.inProgress;
+        _movementInputs.Shield = _playerInputActions.PlayerMovement.Shield.inProgress;
+
+        _movementInputs.JumpEvent = false;
+
+        if (_movementInputs.Jump == true && oldJump == false)
+        {
+            _movementInputs.JumpEvent = true;
+        }
+
+        Vector2 direction = _movementInputs.Direction;
+        Vector2 strongDirection = Vector2.zero;
+
+        if ((Mathf.Abs(direction.x - oldDirection.x) > 0.25f) && Mathf.Abs(direction.x) > 0.8f)
+        {
+            strongDirection.x = Mathf.Sign(direction.x);
+        }
+
+        if ((Mathf.Abs(direction.y - oldDirection.y) > 0.25f) && Mathf.Abs(direction.y) > 0.8f)
+        {
+            strongDirection.y = Mathf.Sign(direction.y);
+        }
+
+        _movementInputs.StrongDirection = strongDirection;
+
+        oldJump = _movementInputs.Jump;
+        oldDirection = _movementInputs.Direction;
     }
 }

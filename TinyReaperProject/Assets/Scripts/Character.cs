@@ -56,6 +56,11 @@ public class Character : MonoBehaviour
         _anim.Play(animName);
     }
 
+    public bool AnimOver()
+    {
+        return (_anim.GetCurrentAnimatorStateInfo(0).normalizedTime > 1f);
+    }
+
     public void SetNextState(MoveState nextState)
     {
         this.nextState = nextState;
