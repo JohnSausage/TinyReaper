@@ -14,6 +14,8 @@ public class Player : Character
     private bool oldJump;
     private Vector2 oldDirection;
 
+    public PlayerInputActions PlayerInputActions { get => _playerInputActions; }
+
     protected override void Start()
     {
         base.Start();
@@ -27,6 +29,8 @@ public class Player : Character
         currentState = MoveStateVars.Idle;
         currentState.Enter();
         nextState = MoveStateVars.Idle;
+
+        PauseManager.OnPause += OnPause;
     }
 
     protected override void FixedUpdate()
@@ -82,5 +86,19 @@ public class Player : Character
 
         oldJump = _movementInputs.Jump;
         oldDirection = _movementInputs.Direction;
+    }
+
+    private void OnPause(bool pause)
+    {
+        if(pause)
+        {
+            _playerInputActions.Disable();
+            _playerInput.enabled = false;
+        }
+        else
+        {
+            _playerInput.enabled = true;
+            _playerInputActions.Enable();
+        }
     }
 }

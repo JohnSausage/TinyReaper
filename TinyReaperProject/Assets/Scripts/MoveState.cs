@@ -26,6 +26,7 @@ namespace MoveStates
         public float airDodgeSpeed = 20;
         public bool airDodged;
         public float wallJumpVelocity = 20;
+        public int wallJumpTimeF = 12;
 
         [Space]
 
@@ -649,13 +650,18 @@ namespace MoveStates
                 SetVelocityX(nextVelocity);
 
 
-                if(_chr.LastState == Vars.WallJumpSquat && _timerF < 10)
+                if(_chr.LastState == Vars.WallJumpSquat && _timerF < Vars.wallJumpTimeF)
                 {
                     SetVelocityX(Vars.WallJumpDirection * Vars.maxAirspeed / 1.5f);
                 }
 
-
-                if (Inputs.JumpEvent && Vars.AirJumpCounter < Vars.airJumps)
+                if(Inputs.JumpEvent && Ctr.OnWall)
+                {
+                    _chr.AnimDir = -Ctr.WallDirection;
+                    Vars.WallJumpDirection = -Ctr.WallDirection;
+                    Next(Vars.WallJumpSquat);
+                }
+                else if (Inputs.JumpEvent && Vars.AirJumpCounter < Vars.airJumps)
                 {
                     Vars.AirJumpCounter++;
                     Next(Vars.AirJumpSquat);
@@ -678,7 +684,7 @@ namespace MoveStates
 
             CheckForFastFallRequest();
 
-            if (Inputs.Shield)
+            if (Inputs.Shield && Vars.airDodged == false)
             {
                 Next(Vars.AirDodge);
             }
@@ -950,7 +956,6 @@ namespace MoveStates
 
     public class MS_WallJumpSquat : MoveState
     {
-        private float _savedDir;
         public MS_WallJumpSquat(Character chr) : base(chr)
         {
         }
@@ -961,7 +966,7 @@ namespace MoveStates
 
             Anim("duck");
 
-            Vars.JumpSquatDirection = Vars.WallJumpDirection;
+            _chr.AnimDir = Vars.WallJumpDirection;
         }
 
         public override void Execute()
