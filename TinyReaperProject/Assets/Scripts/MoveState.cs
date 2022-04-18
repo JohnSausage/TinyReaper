@@ -25,12 +25,22 @@ namespace MoveStates
         public int airDodgeTimeF = 30;
         public float airDodgeSpeed = 20;
         public bool airDodged;
+        public float wallJumpVelocity = 20;
+
+        [Space]
+
+        public int fallThroughPlatformTimerF = 15;
+        public int FallThroughPlatformTimer { get; set; }
+
+        public int fastFallRequestTimeF = 15;
+        public int FastFallRequestTimer { get; set; }
 
         public int AirJumpCounter { get; set; }
         public float DashDirection { get; set; }
         public float SkidDirection { get; set; }
         public float JumpSquatDirection { get; set; }
         public float RollDirection { get; set; }
+        public float WallJumpDirection { get; set; }
 
         [Space]
 
@@ -48,6 +58,8 @@ namespace MoveStates
         [SerializeField] private MS_Shield shield;
         [SerializeField] private MS_Roll roll;
         [SerializeField] private MS_AirDodge airDodge;
+        [SerializeField] private MS_OnWall onWall;
+        [SerializeField] private MS_WallJumpSquat wallJumpSquat;
 
         public MS_Idle Idle { get => idle; }
         public MS_Duck Duck { get => duck; }
@@ -62,6 +74,8 @@ namespace MoveStates
         public MS_Shield Shield { get => shield; }
         public MS_Roll Roll { get => roll; }
         public MS_AirDodge AirDodge { get => airDodge; }
+        public MS_OnWall OnWall { get => onWall; }
+        public MS_WallJumpSquat WallJumpSquat { get => wallJumpSquat; }
 
         public void InitStates(Character chr)
         {
@@ -78,6 +92,8 @@ namespace MoveStates
             shield = new MS_Shield(chr);
             roll = new MS_Roll(chr);
             airDodge = new MS_AirDodge(chr);
+            onWall = new MS_OnWall(chr);
+            wallJumpSquat = new MS_WallJumpSquat(chr);
         }
     }
 
@@ -104,6 +120,10 @@ namespace MoveStates
         public virtual void Execute()
         {
             _timerF++;
+            if (Vars.FallThroughPlatformTimer > 0)
+            {
+                Vars.FallThroughPlatformTimer--;
+            }
         }
 
         public virtual void Exit()
@@ -162,13 +182,52 @@ namespace MoveStates
 
         protected void CheckFallThroughPlatform()
         {
-            if (Inputs.Direction.y < -0.90f)
+            if (Ctr.IsGrounded)
             {
+                if (Inputs.StrongDirection.y < -0.90f)
+                {
+                    Vars.FallThroughPlatformTimer = Vars.fallThroughPlatformTimerF;
+                }
+            }
+            else
+            {
+                if (Inputs.Direction.y < -0.90f)
+                {
+                    Vars.FallThroughPlatformTimer = Vars.fallThroughPlatformTimerF;
+                }
+            }
+
+            if (Inputs.Direction.y >= 0f)
+            {
+                Vars.FallThroughPlatformTimer = 0;
+            }
+
+            if (Vars.FallThroughPlatformTimer > 0)
+            {
+                Vars.FallThroughPlatformTimer--;
                 Ctr.FallThroughPlatforms = true;
             }
             else
             {
                 Ctr.FallThroughPlatforms = false;
+            }
+        }
+
+        protected void CheckForFastFallRequest()
+        {
+            if (Inputs.StrongDirection.y < -0.9f)
+            {
+                Vars.FastFallRequestTimer = Vars.fastFallRequestTimeF;
+            }
+
+            if (Vars.FastFallRequestTimer > 0)
+            {
+                Vars.FastFallRequestTimer--;
+                Ctr.fastFall = true;
+            }
+            else
+            {
+                Ctr.fastFall = false;
             }
         }
 
@@ -201,6 +260,8 @@ namespace MoveStates
             Vars.airDodged = false;
             Vars.AirJumpCounter = 0;
             Vars.SkidDirection = 0;
+            Vars.FallThroughPlatformTimer = 0;
+            Vars.FastFallRequestTimer = 0;
         }
 
         public override void Execute()
@@ -509,8 +570,18 @@ namespace MoveStates
 
     public class MS_Jump : MoveState
     {
+        private int _onWallTimer;
+        private int _onWallTimeF = 5;
+
         public MS_Jump(Character chr) : base(chr)
         {
+        }
+
+        public override void Enter()
+        {
+            base.Enter();
+
+            _onWallTimer = 0;
         }
 
         public override void Execute()
@@ -576,6 +647,14 @@ namespace MoveStates
                 nextVelocity = Mathf.Clamp(nextVelocity, -Vars.maxAirspeed, Vars.maxAirspeed);
 
                 SetVelocityX(nextVelocity);
+
+
+                if(_chr.LastState == Vars.WallJumpSquat && _timerF < 10)
+                {
+                    SetVelocityX(Vars.WallJumpDirection * Vars.maxAirspeed / 1.5f);
+                }
+
+
                 if (Inputs.JumpEvent && Vars.AirJumpCounter < Vars.airJumps)
                 {
                     Vars.AirJumpCounter++;
@@ -583,10 +662,21 @@ namespace MoveStates
                 }
             }
 
-            if (Inputs.Direction.y < -0.9f && Ctr.OutputVelocity.y < 1f)
+            if (Ctr.OnWall == true)
             {
-                Ctr.fastFall = true;
+                _onWallTimer++;
             }
+            else
+            {
+                _onWallTimer = 0;
+            }
+
+            if (_onWallTimer > _onWallTimeF && Ctr.OutputVelocity.y < 0)
+            {
+                Next(Vars.OnWall);
+            }
+
+            CheckForFastFallRequest();
 
             if (Inputs.Shield)
             {
@@ -611,6 +701,8 @@ namespace MoveStates
             Vars.AirJumpCounter = 0;
             Vars.SkidDirection = 0;
             Vars.airDodged = false;
+            Vars.FallThroughPlatformTimer = 0;
+            Vars.FastFallRequestTimer = 0;
 
             Anim("duck");
         }
@@ -738,7 +830,7 @@ namespace MoveStates
 
     public class MS_AirDodge : MoveState
     {
-        bool neutralAirDodge = false;
+        private bool _neutralAirDodge = false;
 
         public MS_AirDodge(Character chr) : base(chr)
         {
@@ -752,21 +844,23 @@ namespace MoveStates
 
             if (Inputs.Direction.magnitude < 0.25f)
             {
-                neutralAirDodge = true;
+                _neutralAirDodge = true;
             }
             else
             {
-                neutralAirDodge = false;
+                _neutralAirDodge = false;
             }
 
             Vars.airDodged = true;
+            Ctr.FallThroughPlatforms = false;
+            Vars.FastFallRequestTimer = 0;
         }
 
         public override void Execute()
         {
             base.Execute();
 
-            if (neutralAirDodge == true)
+            if (_neutralAirDodge == true)
             {
 
             }
@@ -787,7 +881,7 @@ namespace MoveStates
                 else if (_timerF < 4)
                 {
                     SetVelocityX(Inputs.Direction.x * Vars.airDodgeSpeed);
-                    _chr.SetJumpVelocity((Inputs.Direction.y + 0.5f) * Vars.airDodgeSpeed / 2f);
+                    _chr.SetJumpVelocity((Inputs.Direction.y + 0.5f) * Vars.airDodgeSpeed / 1.5f);
                 }
             }
 
@@ -796,7 +890,6 @@ namespace MoveStates
                 Next(Vars.Jump);
             }
 
-            CheckFallThroughPlatform();
             CheckIfLanding();
         }
 
@@ -805,6 +898,84 @@ namespace MoveStates
             base.Exit();
 
             Ctr.ResetVelocity = false;
+        }
+    }
+
+    public class MS_OnWall : MoveState
+    {
+        private float _savedDir;
+        public MS_OnWall(Character chr) : base(chr)
+        {
+        }
+
+        public override void Enter()
+        {
+            base.Enter();
+
+            _savedDir = _chr.AnimDir;
+
+            _chr.AnimDir = -Ctr.WallDirection;
+
+            Anim("onWall");
+        }
+
+        public override void Execute()
+        {
+            base.Execute();
+
+            Vars.WallJumpDirection = -Ctr.WallDirection;
+
+            SetVelocityX(Inputs.Direction.x);
+
+            if (Ctr.OnWall == false)
+            {
+                Next(Vars.Jump);
+            }
+
+            if(Inputs.Jump)
+            {
+                Next(Vars.WallJumpSquat);
+            }
+
+            CheckIfLanding();
+        }
+
+        public override void Exit()
+        {
+            base.Exit();
+
+            _chr.AnimDir = _savedDir;
+        }
+    }
+
+    public class MS_WallJumpSquat : MoveState
+    {
+        private float _savedDir;
+        public MS_WallJumpSquat(Character chr) : base(chr)
+        {
+        }
+
+        public override void Enter()
+        {
+            base.Enter();
+
+            Anim("duck");
+
+            Vars.JumpSquatDirection = Vars.WallJumpDirection;
+        }
+
+        public override void Execute()
+        {
+            base.Execute();
+
+            Inputs.Direction = Vector2.zero;
+
+            if (_timerF > 3)
+            {
+                Next(Vars.Jump);
+
+                _chr.SetJumpVelocity(_chr.MoveStateVars.wallJumpVelocity);
+            }
         }
     }
 }

@@ -40,10 +40,10 @@ public class MovementController : MonoBehaviour
 
 
     /* checks */
-    public bool IsGrounded { get; protected set; }
+    public bool IsGrounded;// { get; protected set; }
     public bool WasGrounded { get; protected set; }
-    public bool HasCollided { get; protected set; }
-    public bool OnWall { get; protected set; }
+    public bool HasCollided;// { get; protected set; }
+    public bool OnWall;// { get; protected set; }
     public bool OnWallTimed { get; protected set; }
     public bool OnLedge { get; protected set; }
     public bool IsJumping { get; protected set; }
@@ -660,9 +660,12 @@ public class MovementController : MonoBehaviour
 
         if (newSlopeUpCheck)
         {
-            velocity = Vector2.ClampMagnitude(velocity, HitDistance(newSlopeUpCheck));
-
             slopeUpAngle = Vector2.Angle(Vector2.up, newSlopeUpCheck.normal);
+
+            if (slopeUpAngle < 90) //do not stop if colliding sideways with a platform
+            {
+                velocity = Vector2.ClampMagnitude(velocity, HitDistance(newSlopeUpCheck));
+            }
         }
         return newSlopeUpCheck;
     }
