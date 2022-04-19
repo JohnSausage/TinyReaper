@@ -168,6 +168,17 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""ed37692d-fdd1-4c88-a64d-754f9ed3d4bf"",
+                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Shield"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""29010479-e4b8-485a-9f14-e65bd7a454fd"",
                     ""path"": ""<Keyboard>/leftAlt"",
                     ""interactions"": """",

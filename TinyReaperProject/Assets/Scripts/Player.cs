@@ -9,20 +9,17 @@ public class Player : Character
     [SerializeField] private string _stateName;
 
     private PlayerInput _playerInput;
-    private PlayerInputActions _playerInputActions;
 
     private bool oldJump;
     private Vector2 oldDirection;
 
-    public PlayerInputActions PlayerInputActions { get => _playerInputActions; }
 
     protected override void Start()
     {
         base.Start();
 
         _playerInput = GetComponent<PlayerInput>();
-        _playerInputActions = new PlayerInputActions();
-        _playerInputActions.Enable();
+        _playerInput.actions.Enable();
 
         MoveStateVars.InitStates(this);
 
@@ -47,7 +44,7 @@ public class Player : Character
 
             _stateName = currentState.ToString();
 
-            Debug.Log(_stateName);
+            //Debug.Log(_stateName);
         }
 
         currentState.Execute();
@@ -58,9 +55,9 @@ public class Player : Character
 
     private void GetInputs()
     {
-        _movementInputs.Direction = _playerInputActions.PlayerMovement.Move.ReadValue<Vector2>();
-        _movementInputs.Jump = _playerInputActions.PlayerMovement.Jump.inProgress;
-        _movementInputs.Shield = _playerInputActions.PlayerMovement.Shield.inProgress;
+        _movementInputs.Direction = _playerInput.actions["Move"].ReadValue<Vector2>();
+        _movementInputs.Jump = _playerInput.actions["Jump"].inProgress;
+        _movementInputs.Shield = _playerInput.actions["Shield"].inProgress;
 
         _movementInputs.JumpEvent = false;
 
@@ -92,13 +89,13 @@ public class Player : Character
     {
         if(pause)
         {
-            _playerInputActions.Disable();
+            _playerInput.actions.Disable();
             _playerInput.enabled = false;
         }
         else
         {
             _playerInput.enabled = true;
-            _playerInputActions.Enable();
+            _playerInput.actions.Enable();
         }
     }
 }
