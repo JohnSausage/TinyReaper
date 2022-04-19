@@ -116,6 +116,8 @@ namespace MoveStates
         public virtual void Enter()
         {
             _timerF = 0;
+
+            _chr.TriggerOnEnterStateEvents(this);
         }
 
         public virtual void Execute()

@@ -85,9 +85,16 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0.083333336
-    functionName: 
+    functionName: Step
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 8300000, guid: 54febf39550ae4f41a2b6baae756c73e, type: 3}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.33333334
+    functionName: Step
+    data: 
+    objectReferenceParameter: {fileID: 8300000, guid: 54febf39550ae4f41a2b6baae756c73e, type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

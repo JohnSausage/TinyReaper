@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using MoveStates;
@@ -19,6 +19,12 @@ public class Character : MonoBehaviour
     [SerializeField] protected MovementInputs _movementInputs;
 
     public Vector2 DirectionalInput { get => _movementInputs.Direction; }
+
+
+    //Events
+
+    public event Action<MoveState> AOnLand;
+
 
     public float AnimDir
     {
@@ -74,5 +80,10 @@ public class Character : MonoBehaviour
     public void SetJumpVelocity(float jumpVelocity)
     {
         _movementController.JumpVelocity = jumpVelocity;
+    }
+
+    public void TriggerOnEnterStateEvents(MoveState moveState)
+    {
+        AOnLand?.Invoke(moveState);
     }
 }
