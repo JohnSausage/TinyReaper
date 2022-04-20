@@ -15,6 +15,9 @@ public class Hurtbox : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        if(_col == null) _col = GetComponent<CircleCollider2D>();
+        if (_col == null) return;
+
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(_col.bounds.center, _col.radius);
     }
