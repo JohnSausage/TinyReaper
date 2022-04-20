@@ -14,6 +14,7 @@ public class DemoManager : MonoBehaviour
 
     private int _collectedOrbs;
 
+    private int MaxOrbs { get => _collectableOrbs.Count; }
     private void Awake()
     {
         _collectableOrbs = new List<CollectableOrb>();
@@ -26,12 +27,14 @@ public class DemoManager : MonoBehaviour
         _collectableOrbs.ForEach(x => x.AOnGetCollected += OnOrbCollection);
 
         _playerStartPosition = _player.transform.position;
+
+        UpdateOrbDisplay();
     }
 
     public void ResetDemo()
     {
         _collectedOrbs = 0;
-        _orbDisplay.text = _collectedOrbs.ToString();
+        UpdateOrbDisplay();
 
         _collectableOrbs.ForEach(x => x.EnableOrb());
 
@@ -41,8 +44,12 @@ public class DemoManager : MonoBehaviour
     private void OnOrbCollection(CollectableOrb orb)
     {
         _collectedOrbs++;
-        _orbDisplay.text = _collectedOrbs.ToString();
+        UpdateOrbDisplay();
         orb.DisableOrb();
+    }
 
+    private void UpdateOrbDisplay()
+    {
+        _orbDisplay.text = _collectedOrbs + " / " + MaxOrbs;
     }
 }

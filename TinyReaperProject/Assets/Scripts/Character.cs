@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MoveStates;
 
-public class Character : MonoBehaviour
+public class Character : MonoBehaviour, ICanTakeDamage
 {
     protected MoveState currentState;
     protected MoveState nextState;
@@ -24,6 +24,8 @@ public class Character : MonoBehaviour
     //Events
 
     public event Action<MoveState> AOnLand;
+    public event Action<Damage> AGetHit;
+    public event Action<Damage> ATakeDamage;
 
 
     public float AnimDir
@@ -44,12 +46,14 @@ public class Character : MonoBehaviour
 
     public MovementInputs MovementInputs { get => _movementInputs; }
     public MoveStateVars MoveStateVars { get => _moveStateVars; }
+    public Damage CurrentDamage { get; set; }
 
     protected virtual void Start()
     {
         _movementInputs = new MovementInputs();
         _movementController = GetComponent<MovementController>();
         _anim = GetComponentInChildren<Animator>();
+        CurrentDamage = new Damage();
     }
 
     protected virtual void FixedUpdate()
@@ -85,5 +89,20 @@ public class Character : MonoBehaviour
     public void TriggerOnEnterStateEvents(MoveState moveState)
     {
         AOnLand?.Invoke(moveState);
+    }
+
+    public void GetHit(Damage damage)
+    {
+        if (CurrentDamage.DamageID == damage.DamageID) return;
+
+        AGetHit?.Invoke(damage);
+
+        TakeDamage(damage);
+    }
+
+    public void TakeDamage(Damage damage)
+    {
+        CurrentDamage = damage.Clone();
+        ATakeDamage?.Invoke(CurrentDamage);
     }
 }

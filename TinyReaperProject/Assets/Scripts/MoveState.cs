@@ -42,8 +42,10 @@ namespace MoveStates
         public float JumpSquatDirection { get; set; }
         public float RollDirection { get; set; }
         public float WallJumpDirection { get; set; }
+        public int NextStatePrio { get; set; }
 
         [Space]
+
 
         //States
         [SerializeField] private MS_Idle idle;
@@ -61,6 +63,10 @@ namespace MoveStates
         [SerializeField] private MS_AirDodge airDodge;
         [SerializeField] private MS_OnWall onWall;
         [SerializeField] private MS_WallJumpSquat wallJumpSquat;
+        [SerializeField] private MS_TakeDamage takeDamage;
+        [SerializeField] private MS_Knockback knockback;
+        [SerializeField] private MS_HitLand hitLand;
+        [SerializeField] private MS_HitLanded hitLanded;
 
         public MS_Idle Idle { get => idle; }
         public MS_Duck Duck { get => duck; }
@@ -77,6 +83,10 @@ namespace MoveStates
         public MS_AirDodge AirDodge { get => airDodge; }
         public MS_OnWall OnWall { get => onWall; }
         public MS_WallJumpSquat WallJumpSquat { get => wallJumpSquat; }
+        public MS_TakeDamage TakeDamage { get => takeDamage; }
+        public MS_Knockback Knockback { get => knockback;  }
+        public MS_HitLand HitLand { get => hitLand;}
+        public MS_HitLanded HitLanded { get => hitLanded;  }
 
         public void InitStates(Character chr)
         {
@@ -95,6 +105,10 @@ namespace MoveStates
             airDodge = new MS_AirDodge(chr);
             onWall = new MS_OnWall(chr);
             wallJumpSquat = new MS_WallJumpSquat(chr);
+            takeDamage = new MS_TakeDamage(chr);
+            knockback = new MS_Knockback(chr);
+            hitLand = new MS_HitLand(chr);
+            hitLanded = new MS_HitLanded(chr);
         }
     }
 
@@ -118,6 +132,8 @@ namespace MoveStates
             _timerF = 0;
 
             _chr.TriggerOnEnterStateEvents(this);
+
+            _chr.ATakeDamage += OnTakeDamage;
         }
 
         public virtual void Execute()
@@ -131,7 +147,9 @@ namespace MoveStates
 
         public virtual void Exit()
         {
+            _chr.ATakeDamage -= OnTakeDamage;
 
+            Vars.NextStatePrio = 0;
         }
 
         protected void Anim(string animName)
@@ -139,9 +157,13 @@ namespace MoveStates
             _chr.Animate(animName);
         }
 
-        protected void Next(MoveState nextState)
+        protected void Next(MoveState nextState, int prio = 0)
         {
-            _chr.SetNextState(nextState);
+            if (prio >= Vars.NextStatePrio)
+            {
+                Vars.NextStatePrio = prio;
+                _chr.SetNextState(nextState);
+            }
         }
 
         protected void SetVelocityX(float inputX)
@@ -245,6 +267,11 @@ namespace MoveStates
             {
                 Next(Vars.Shield);
             }
+        }
+
+        protected void OnTakeDamage(Damage damage)
+        {
+            Next(Vars.TakeDamage, 5);
         }
     }
 
@@ -652,12 +679,12 @@ namespace MoveStates
                 SetVelocityX(nextVelocity);
 
 
-                if(_chr.LastState == Vars.WallJumpSquat && _timerF < Vars.wallJumpTimeF)
+                if (_chr.LastState == Vars.WallJumpSquat && _timerF < Vars.wallJumpTimeF)
                 {
                     SetVelocityX(Vars.WallJumpDirection * Vars.maxAirspeed / 1.5f);
                 }
 
-                if(Inputs.JumpEvent && Ctr.OnWall)
+                if (Inputs.JumpEvent && Ctr.OnWall)
                 {
                     _chr.AnimDir = -Ctr.WallDirection;
                     Vars.WallJumpDirection = -Ctr.WallDirection;
@@ -940,7 +967,7 @@ namespace MoveStates
                 Next(Vars.Jump);
             }
 
-            if(Inputs.Jump)
+            if (Inputs.Jump)
             {
                 Next(Vars.WallJumpSquat);
             }
@@ -983,6 +1010,69 @@ namespace MoveStates
 
                 _chr.SetJumpVelocity(_chr.MoveStateVars.wallJumpVelocity);
             }
+        }
+    }
+
+    public class MS_TakeDamage : MoveState
+    {
+        public MS_TakeDamage(Character chr) : base(chr)
+        {
+        }
+
+        public override void Enter()
+        {
+            base.Enter();
+
+            _chr.ATakeDamage -= OnTakeDamage;
+
+            Anim("airDodge");
+        }
+
+        public override void Execute()
+        {
+            base.Execute();
+
+            SetVelocityX(0);
+
+            Ctr.ForceMovement = Vector2.right * Random.Range(-1f, 1f);
+
+            if (_timerF > 5)
+            {
+                Next(Vars.Knockback);
+            }
+        }
+    }
+
+    public class MS_Knockback : MoveState
+    {
+        public MS_Knockback(Character chr) : base(chr)
+        {
+        }
+
+        public override void Execute()
+        {
+            base.Execute();
+
+            Ctr.ForceMovement = _chr.CurrentDamage.knockback.direction * _chr.CurrentDamage.knockback.magnitude;
+
+            if(_timerF > 10)
+            {
+                Next(Vars.Jump);
+            }
+        }
+    }
+
+    public class MS_HitLand : MoveState
+    {
+        public MS_HitLand(Character chr) : base(chr)
+        {
+        }
+    }
+
+    public class MS_HitLanded : MoveState
+    {
+        public MS_HitLanded(Character chr) : base(chr)
+        {
         }
     }
 }
