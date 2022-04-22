@@ -90,7 +90,6 @@ public class MovementController : MonoBehaviour
 
     public LayerMask groundMask;
 
-
     /* initialization */
     protected void Start()
     {
@@ -125,13 +124,24 @@ public class MovementController : MonoBehaviour
         }
 
         SetGroundMask();
+
         CheckIfInsidePlatforms();
 
         GiantUpdate();
 
         ClearIgnoredPlatforms();
 
-        transform.Translate(velocity);
+
+        RaycastHit2D finalCheck = Physics2D.BoxCast((Vector2)bounds.center + velocity, bounds.size, 0, Vector2.up, 0, collisionMask);
+        
+        if(finalCheck == false)
+        {
+            transform.Translate(velocity);
+        }
+        else
+        {
+            velocity = Vector2.zero;
+        }
 
         WasGrounded = IsGrounded;
         lastInputVelocity = InputVelocity;
@@ -586,6 +596,41 @@ public class MovementController : MonoBehaviour
         return collisionCheck;
     }
 
+    public void TransportOnPlatform(Vector2 movement)
+    {
+        Vector2 allowedMovement = movement;
+
+        if (IsGrounded == false) allowedMovement.x = 0;
+
+        LayerMask checkCollisionsLayer = collisionMask;
+
+        if (allowedMovement.y <= 0)
+        {
+            checkCollisionsLayer += platformMask;
+        }
+
+        //RaycastHit2D boxCheckXY = RayCastXYNoVelocity(allowedMovement, allowedMovement.magnitude + skin, checkCollisionsLayer);
+        RaycastHit2D boxCheckXY = Physics2D.BoxCast((Vector2)col.bounds.center + velocity, col.bounds.size, 0, allowedMovement, allowedMovement.magnitude, checkCollisionsLayer);
+
+        if (boxCheckXY == false)
+        {
+            transform.Translate(allowedMovement);
+        }
+        else
+        {
+            Vector2 moveY = new Vector2(0, allowedMovement.y);
+
+            //RaycastHit2D boxCheckX = RayCastXYNoVelocity(moveY, moveY.magnitude + skin, checkCollisionsLayer);
+            RaycastHit2D boxCheckX = Physics2D.BoxCast((Vector2)bounds.center + velocity, bounds.size, 0, moveY, moveY.magnitude, checkCollisionsLayer);
+
+
+            if (boxCheckX == false)
+            {
+                transform.Translate(moveY);
+            }
+        }
+    }
+
 
     /// <summary>
     /// checks if the ctr is touching the ground by raycasting
@@ -712,6 +757,7 @@ public class MovementController : MonoBehaviour
 
         return Physics2D.BoxCast(bounds.center, bounds.size, 0, direction, distance + skinDistance, layerMask);
     }
+
 
     public RaycastHit2D RayCastLine(Vector2 direction, float distance, Vector2 center, LayerMask layerMask)
     {

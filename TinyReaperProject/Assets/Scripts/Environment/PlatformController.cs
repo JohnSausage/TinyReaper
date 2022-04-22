@@ -17,11 +17,14 @@ public class PlatformController : MonoBehaviour
     private RaycastHit2D[] _results = new RaycastHit2D[5];
     private BoxCollider2D _platformCol;
 
+    private LayerMask _defaultLayerMask;
     private void Start()
     {
         SetPlatformPosition(_start.position);
         _movingToEndDirection = true;
         _platformCol = _movingPlatform.GetComponent<BoxCollider2D>();
+
+        _defaultLayerMask = _transportingLayer;
     }
 
     private void FixedUpdate()
@@ -62,7 +65,7 @@ public class PlatformController : MonoBehaviour
     {
         _movement = position - (Vector2)_movingPlatform.transform.position;
 
-        _movingPlatform.transform.position = position;
+        _movingPlatform.transform.Translate(_movement);
     }
 
     private void TransportObjects()
@@ -71,9 +74,44 @@ public class PlatformController : MonoBehaviour
 
         int check = Physics2D.BoxCastNonAlloc(_platformCol.bounds.center, _platformCol.bounds.size, 0, Vector2.up, _results, distance, _transportingLayer);
 
+        LayerMask temp = _movingPlatform.layer;
+        _movingPlatform.layer = 0;
+
         for (int i = 0; i < check; i++)
         {
-            _results[i].transform.position += (Vector3)_movement;
+            _results[i].transform.GetComponentInParent<ICanBeTransported>()?.Transport(_movement);
+        }
+
+        _movingPlatform.layer = temp;
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (_platformCol == null) _platformCol = _movingPlatform.GetComponent<BoxCollider2D>();
+        if (_platformCol == null) return;
+
+        Gizmos.color = Color.red;
+
+        Gizmos.DrawWireCube(_start.position, _platformCol.size * _movingPlatform.transform.localScale);
+        Gizmos.DrawWireCube(_end.position, _platformCol.size * _movingPlatform.transform.localScale);
+
+        Gizmos.DrawLine(_start.position, _end.position);
+    }
+
+    public void ActivateLayer(bool activate = true)
+    {
+        if (activate)
+        {
+            _transportingLayer = _defaultLayerMask;
+        }
+        else
+        {
+            _transportingLayer = 0;
         }
     }
+}
+
+public interface ICanBeTransported
+{
+    public void Transport(Vector2 movement);
 }

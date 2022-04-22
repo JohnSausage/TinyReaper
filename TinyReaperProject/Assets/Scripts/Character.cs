@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MoveStates;
 
-public class Character : MonoBehaviour, ICanTakeDamage
+public class Character : MonoBehaviour, ICanTakeDamage, ICanBeTransported
 {
     protected MoveState currentState;
     protected MoveState nextState;
@@ -104,5 +104,10 @@ public class Character : MonoBehaviour, ICanTakeDamage
     {
         CurrentDamage = damage.Clone();
         ATakeDamage?.Invoke(CurrentDamage);
+    }
+
+    public void Transport(Vector2 movement)
+    {
+        _movementController.TransportOnPlatform(movement);
     }
 }

@@ -14,7 +14,7 @@ TagManager:
   - Ground
   - Platform
   - PlayerHurtbox
-  - 
+  - TransportingLayer
   - 
   - 
   - 
@@ -40,6 +40,9 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: BehindPlayer
+    uniqueID: 994280209
     locked: 0
   - name: Player
     uniqueID: 2898882567

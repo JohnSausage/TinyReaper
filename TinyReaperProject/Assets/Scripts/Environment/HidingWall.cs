@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Collider2D))]
 public class HidingWall : MonoBehaviour
 {
     [SerializeField] private float _fadeOutTime = 0.2f;
@@ -15,6 +17,8 @@ public class HidingWall : MonoBehaviour
     private void Start()
     {
         _spr = GetComponent<SpriteRenderer>();
+        GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Kinematic;
+        GetComponent<Collider2D>().isTrigger = true;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
