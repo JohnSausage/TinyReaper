@@ -98,8 +98,8 @@ ScriptedImporter:
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
-      x: 4
-      y: 28952
+      x: 8012
+      y: 22930
       width: 1589
       height: 1005
     spriteID: e0c0f167d2d34e64fb2dbf6de13f917e
@@ -111,8 +111,50 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     parentGroupIndex: -1
-    uvTransform: {x: -13, y: 27638}
-  - name: Platforms
+    uvTransform: {x: 7995, y: 21616}
+  - name: FG_Details
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 8012
+      y: 12020
+      width: 7899
+      height: 5904
+    spriteID: 5705c690e9bf4fc458eca01421699922
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    parentGroupIndex: -1
+    uvTransform: {x: 7946, y: 11940}
+  - name: PlatformsBlack
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 8012
+      y: 17932
+      width: 7866
+      height: 4990
+    spriteID: 138e369a1ae837441b77f52276547c41
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    parentGroupIndex: -1
+    uvTransform: {x: 7960, y: 17651}
+  - name: Ground_Details
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -120,10 +162,10 @@ ScriptedImporter:
     rect:
       serializedVersion: 2
       x: 4
-      y: 24036
-      width: 7806
-      height: 4908
-    spriteID: ca0892b7f37f2884f89c9dc9090f37fb
+      y: 30044
+      width: 7762
+      height: 2362
+    spriteID: 6c7e07c425e15bc4a8b5355ba7ead30f
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -132,91 +174,7 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     parentGroupIndex: -1
-    uvTransform: {x: -91, y: 23685}
-  - name: StonesHighlights
-    originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 0
-    border: {x: 0, y: 0, z: 0, w: 0}
-    rect:
-      serializedVersion: 2
-      x: 6470
-      y: 28952
-      width: 574
-      height: 124
-    spriteID: 19a68d4b3f4d3fe4cb35cb717bfbfa9f
-    spriteBone: []
-    spriteOutline: []
-    vertices: []
-    spritePhysicsOutline: []
-    indices: 
-    edges: []
-    tessellationDetail: 0
-    parentGroupIndex: -1
-    uvTransform: {x: 6389, y: 28572}
-  - name: StonesWithShadow
-    originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 0
-    border: {x: 0, y: 0, z: 0, w: 0}
-    rect:
-      serializedVersion: 2
-      x: 4044
-      y: 28952
-      width: 2418
-      height: 441
-    spriteID: 86846b4d361d7804a95f3d4b0d82972a
-    spriteBone: []
-    spriteOutline: []
-    vertices: []
-    spritePhysicsOutline: []
-    indices: 
-    edges: []
-    tessellationDetail: 0
-    parentGroupIndex: -1
-    uvTransform: {x: 3972, y: 28885}
-  - name: Stones
-    originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 0
-    border: {x: 0, y: 0, z: 0, w: 0}
-    rect:
-      serializedVersion: 2
-      x: 1601
-      y: 29428
-      width: 2418
-      height: 441
-    spriteID: ec7294624cf1b0749928ab23fa3accd1
-    spriteBone: []
-    spriteOutline: []
-    vertices: []
-    spritePhysicsOutline: []
-    indices: 
-    edges: []
-    tessellationDetail: 0
-    parentGroupIndex: -1
-    uvTransform: {x: 1529, y: 29361}
-  - name: StonesBG
-    originalName: 
-    pivot: {x: 0.5, y: 0.5}
-    alignment: 0
-    border: {x: 0, y: 0, z: 0, w: 0}
-    rect:
-      serializedVersion: 2
-      x: 1601
-      y: 28952
-      width: 2435
-      height: 468
-    spriteID: f46b735e1aee8824ebe864b901770ef5
-    spriteBone: []
-    spriteOutline: []
-    vertices: []
-    spritePhysicsOutline: []
-    indices: 
-    edges: []
-    tessellationDetail: 0
-    parentGroupIndex: -1
-    uvTransform: {x: 1545, y: 28906}
+    uvTransform: {x: -127, y: 29921}
   - name: Ground
     originalName: 
     pivot: {x: 0.5, y: 0.5}
@@ -238,7 +196,7 @@ ScriptedImporter:
     tessellationDetail: 0
     parentGroupIndex: -1
     uvTransform: {x: 4, y: 4}
-  - name: Behind1
+  - name: Fog1
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -247,6 +205,27 @@ ScriptedImporter:
       serializedVersion: 2
       x: 4
       y: 6012
+      width: 8000
+      height: 6000
+    spriteID: dfb470a33ea458c45b948026c2306299
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    parentGroupIndex: -1
+    uvTransform: {x: 4, y: 6012}
+  - name: Behind1
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 4
+      y: 12020
       width: 8000
       height: 6000
     spriteID: 71c2785525a23704aa1e6290b0d18bd3
@@ -258,7 +237,28 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     parentGroupIndex: -1
-    uvTransform: {x: 4, y: 6012}
+    uvTransform: {x: 4, y: 12020}
+  - name: Fog2
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 4
+      y: 18028
+      width: 8000
+      height: 6000
+    spriteID: 77f8d4e566003a743a40a37c530548a9
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    parentGroupIndex: -1
+    uvTransform: {x: 4, y: 18028}
   - name: Behind2
     originalName: 
     pivot: {x: 0.5, y: 0.5}
@@ -267,7 +267,7 @@ ScriptedImporter:
     rect:
       serializedVersion: 2
       x: 4
-      y: 12020
+      y: 24036
       width: 8000
       height: 6000
     spriteID: 47d26e9c90edf03419f916c47c2bc2c2
@@ -279,19 +279,19 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     parentGroupIndex: -1
-    uvTransform: {x: 4, y: 12020}
-  - name: Black
+    uvTransform: {x: 4, y: 24036}
+  - name: Fog3
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
-      x: 4
-      y: 18028
-      width: 8000
+      x: 8012
+      y: 6012
+      width: 7885
       height: 6000
-    spriteID: 83d382ce5ab56f74fb7a7ffd4522c43d
+    spriteID: dbe9df36ed68ad54aac6fdadb8d36ea1
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -300,7 +300,28 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     parentGroupIndex: -1
-    uvTransform: {x: 4, y: 18028}
+    uvTransform: {x: 7897, y: 6012}
+  - name: BG
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 8012
+      y: 4
+      width: 8000
+      height: 6000
+    spriteID: cf5b167826643c14eb663c4ba1e4033e
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    parentGroupIndex: -1
+    uvTransform: {x: 8012, y: 4}
   characterData:
     bones: []
     parts: []
@@ -380,7 +401,27 @@ ScriptedImporter:
     parentIndex: -1
     spriteID: e0c0f167d2d34e64fb2dbf6de13f917e
     layerID: -612823479
-    mosaicPosition: {x: 4, y: 28952}
+    mosaicPosition: {x: 8012, y: 22930}
+    flatten: 0
+    isImported: 1
+    isVisible: 1
+  - name: FG_Details
+    spriteName: FG_Details
+    isGroup: 0
+    parentIndex: -1
+    spriteID: 5705c690e9bf4fc458eca01421699922
+    layerID: -1469424772
+    mosaicPosition: {x: 8012, y: 12020}
+    flatten: 0
+    isImported: 1
+    isVisible: 1
+  - name: PlatformsBlack
+    spriteName: PlatformsBlack
+    isGroup: 0
+    parentIndex: -1
+    spriteID: 138e369a1ae837441b77f52276547c41
+    layerID: 2080864175
+    mosaicPosition: {x: 8012, y: 17932}
     flatten: 0
     isImported: 1
     isVisible: 1
@@ -390,10 +431,10 @@ ScriptedImporter:
     parentIndex: -1
     spriteID: ca0892b7f37f2884f89c9dc9090f37fb
     layerID: 71716590
-    mosaicPosition: {x: 4, y: 24036}
+    mosaicPosition: {x: 8012, y: 12020}
     flatten: 0
-    isImported: 1
-    isVisible: 1
+    isImported: 0
+    isVisible: 0
   - name: Stones
     spriteName: 
     isGroup: 1
@@ -403,11 +444,11 @@ ScriptedImporter:
     mosaicPosition: {x: 0, y: 0}
     flatten: 0
     isImported: 0
-    isVisible: 1
+    isVisible: 0
   - name: StonesTop
     spriteName: 
     isGroup: 0
-    parentIndex: 3
+    parentIndex: 5
     spriteID: 916d2ff5004108343a990e7147a14044
     layerID: 653629767
     mosaicPosition: {x: 0, y: 0}
@@ -417,40 +458,50 @@ ScriptedImporter:
   - name: StonesHighlights
     spriteName: StonesHighlights
     isGroup: 0
-    parentIndex: 3
+    parentIndex: 5
     spriteID: 19a68d4b3f4d3fe4cb35cb717bfbfa9f
     layerID: -2135429241
     mosaicPosition: {x: 6470, y: 28952}
     flatten: 0
-    isImported: 1
+    isImported: 0
     isVisible: 1
   - name: StonesWithShadow
     spriteName: StonesWithShadow
     isGroup: 0
-    parentIndex: 3
+    parentIndex: 5
     spriteID: 86846b4d361d7804a95f3d4b0d82972a
     layerID: 745840048
     mosaicPosition: {x: 4044, y: 28952}
     flatten: 0
-    isImported: 1
+    isImported: 0
     isVisible: 1
   - name: Stones
     spriteName: Stones
     isGroup: 0
-    parentIndex: 3
+    parentIndex: 5
     spriteID: ec7294624cf1b0749928ab23fa3accd1
     layerID: 1390256844
     mosaicPosition: {x: 1601, y: 29428}
     flatten: 0
-    isImported: 1
+    isImported: 0
     isVisible: 1
   - name: StonesBG
     spriteName: StonesBG
     isGroup: 0
-    parentIndex: 3
+    parentIndex: 5
     spriteID: f46b735e1aee8824ebe864b901770ef5
     layerID: 1746488405
     mosaicPosition: {x: 1601, y: 28952}
+    flatten: 0
+    isImported: 0
+    isVisible: 1
+  - name: Ground_Details
+    spriteName: Ground_Details
+    isGroup: 0
+    parentIndex: -1
+    spriteID: 6c7e07c425e15bc4a8b5355ba7ead30f
+    layerID: 2062981296
+    mosaicPosition: {x: 4, y: 30044}
     flatten: 0
     isImported: 1
     isVisible: 1
@@ -464,13 +515,33 @@ ScriptedImporter:
     flatten: 0
     isImported: 1
     isVisible: 1
+  - name: Fog1
+    spriteName: Fog1
+    isGroup: 0
+    parentIndex: -1
+    spriteID: dfb470a33ea458c45b948026c2306299
+    layerID: 1769841099
+    mosaicPosition: {x: 4, y: 6012}
+    flatten: 0
+    isImported: 1
+    isVisible: 1
   - name: Behind1
     spriteName: Behind1
     isGroup: 0
     parentIndex: -1
     spriteID: 71c2785525a23704aa1e6290b0d18bd3
     layerID: -339568847
-    mosaicPosition: {x: 4, y: 6012}
+    mosaicPosition: {x: 4, y: 12020}
+    flatten: 0
+    isImported: 1
+    isVisible: 1
+  - name: Fog2
+    spriteName: Fog2
+    isGroup: 0
+    parentIndex: -1
+    spriteID: 77f8d4e566003a743a40a37c530548a9
+    layerID: 1366556572
+    mosaicPosition: {x: 4, y: 18028}
     flatten: 0
     isImported: 1
     isVisible: 1
@@ -480,17 +551,27 @@ ScriptedImporter:
     parentIndex: -1
     spriteID: 47d26e9c90edf03419f916c47c2bc2c2
     layerID: -339568844
-    mosaicPosition: {x: 4, y: 12020}
+    mosaicPosition: {x: 4, y: 24036}
     flatten: 0
     isImported: 1
     isVisible: 1
-  - name: Black
-    spriteName: Black
+  - name: Fog3
+    spriteName: Fog3
     isGroup: 0
     parentIndex: -1
-    spriteID: 83d382ce5ab56f74fb7a7ffd4522c43d
-    layerID: 34081887
-    mosaicPosition: {x: 4, y: 18028}
+    spriteID: dbe9df36ed68ad54aac6fdadb8d36ea1
+    layerID: -1362326783
+    mosaicPosition: {x: 8012, y: 6012}
+    flatten: 0
+    isImported: 1
+    isVisible: 1
+  - name: BG
+    spriteName: BG
+    isGroup: 0
+    parentIndex: -1
+    spriteID: cf5b167826643c14eb663c4ba1e4033e
+    layerID: 433908497
+    mosaicPosition: {x: 8012, y: 4}
     flatten: 0
     isImported: 1
     isVisible: 1
