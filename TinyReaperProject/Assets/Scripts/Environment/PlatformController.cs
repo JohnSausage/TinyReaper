@@ -70,9 +70,9 @@ public class PlatformController : MonoBehaviour
 
     private void TransportObjects()
     {
-        float distance = 0.2f;
+        float distance = 0.4f;
 
-        int check = Physics2D.BoxCastNonAlloc(_platformCol.bounds.center, _platformCol.bounds.size, 0, Vector2.up, _results, distance, _transportingLayer);
+        int check = Physics2D.BoxCastNonAlloc(_platformCol.bounds.center + (Vector3)_movement, _platformCol.bounds.size, 0, Vector2.up, _results, distance, _transportingLayer);
 
         LayerMask temp = _movingPlatform.layer;
         _movingPlatform.layer = 0;

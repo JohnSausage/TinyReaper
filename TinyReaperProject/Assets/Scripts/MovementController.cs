@@ -90,6 +90,8 @@ public class MovementController : MonoBehaviour
 
     public LayerMask groundMask;
 
+    private Vector2 _platformMovement;
+
     /* initialization */
     protected void Start()
     {
@@ -105,6 +107,7 @@ public class MovementController : MonoBehaviour
     {
         bounds = col.bounds;
         bounds.Expand(-2 * skin);
+
 
         HasCollided = false;
         OnWall = false;
@@ -132,9 +135,9 @@ public class MovementController : MonoBehaviour
         ClearIgnoredPlatforms();
 
 
-        RaycastHit2D finalCheck = Physics2D.BoxCast((Vector2)bounds.center + velocity, bounds.size, 0, Vector2.up, 0, collisionMask);
-        
-        if(finalCheck == false)
+        RaycastHit2D finalCheck = Physics2D.BoxCast((Vector2)bounds.center + velocity + _platformMovement, bounds.size, 0, Vector2.up, 0, collisionMask);
+
+        if (finalCheck == false)
         {
             transform.Translate(velocity);
         }
@@ -145,6 +148,7 @@ public class MovementController : MonoBehaviour
 
         WasGrounded = IsGrounded;
         lastInputVelocity = InputVelocity;
+        _platformMovement = Vector2.zero;
     }
 
     public enum EGroundMoveState { None, Idle, Moving, SlopeUp, SlopeDown };
@@ -610,25 +614,57 @@ public class MovementController : MonoBehaviour
         }
 
         //RaycastHit2D boxCheckXY = RayCastXYNoVelocity(allowedMovement, allowedMovement.magnitude + skin, checkCollisionsLayer);
-        RaycastHit2D boxCheckXY = Physics2D.BoxCast((Vector2)col.bounds.center + velocity, col.bounds.size, 0, allowedMovement, allowedMovement.magnitude, checkCollisionsLayer);
+        RaycastHit2D boxCheckXY = Physics2D.BoxCast((Vector2)col.bounds.center/* + velocity*/, bounds.size, 0, allowedMovement, allowedMovement.magnitude + skin, checkCollisionsLayer);
 
-        if (boxCheckXY == false)
+        if (boxCheckXY == true)
         {
-            transform.Translate(allowedMovement);
-        }
-        else
-        {
-            Vector2 moveY = new Vector2(0, allowedMovement.y);
+            allowedMovement.x = 0;
 
-            //RaycastHit2D boxCheckX = RayCastXYNoVelocity(moveY, moveY.magnitude + skin, checkCollisionsLayer);
-            RaycastHit2D boxCheckX = Physics2D.BoxCast((Vector2)bounds.center + velocity, bounds.size, 0, moveY, moveY.magnitude, checkCollisionsLayer);
+            RaycastHit2D boxCheckX;
 
+            boxCheckX = Physics2D.BoxCast((Vector2)col.bounds.center/* + velocity*/, bounds.size, 0, allowedMovement, allowedMovement.magnitude + skin, checkCollisionsLayer);
 
-            if (boxCheckX == false)
+            if (boxCheckX == true)
             {
-                transform.Translate(moveY);
+                allowedMovement = Vector2.ClampMagnitude(allowedMovement, HitDistance(boxCheckX));
             }
         }
+
+        //if (boxCheckXY == true)
+        //{
+        //    allowedMovement = new Vector2(0, allowedMovement.y);
+
+        //    //RaycastHit2D boxCheckX = RayCastXYNoVelocity(moveY, moveY.magnitude + skin, checkCollisionsLayer);
+        //    RaycastHit2D boxCheckX;
+        //    if (allowedMovement.y < 0)
+        //    {
+        //        boxCheckX = Physics2D.BoxCast((Vector2)col.bounds.center/* + velocity*/, col.bounds.size, 0, allowedMovement, allowedMovement.magnitude, checkCollisionsLayer);
+        //    }
+        //    else
+        //    {
+        //        boxCheckX = Physics2D.BoxCast((Vector2)col.bounds.center/* + velocity*/, bounds.size, 0, allowedMovement, allowedMovement.magnitude + skin, checkCollisionsLayer);
+        //    }
+
+        //    if (boxCheckX == true)
+        //    {
+        //        allowedMovement = Vector2.zero;
+        //    }
+        //}
+
+        //RaycastHit2D movingPlatformCheck = Physics2D.BoxCast((Vector2)bounds.center + allowedMovement, bounds.size, 0, Vector2.up, 0, collisionMask);
+
+        //if (movingPlatformCheck == false)
+        //{
+        //    transform.Translate(allowedMovement);
+        //}
+        //else
+        //{
+        //    allowedMovement = Vector2.zero;
+        //}
+
+        transform.Translate(allowedMovement);
+
+        _platformMovement = allowedMovement;
     }
 
 
@@ -644,6 +680,7 @@ public class MovementController : MonoBehaviour
         {
             return false;
         }
+
 
         // don't check if the ctr is in tumble and is getting launched upwards
         if (IsInTumble)
@@ -818,7 +855,7 @@ public class MovementController : MonoBehaviour
         ignoredPlatforms.Clear();
 
         /* repeatedly check for platforms and add them to the list of ignored platforms*/
-        RaycastHit2D platformCheck = RayCastXY(Vector2.up, 0, platformMask);
+        RaycastHit2D platformCheck = RayCastXY(Vector2.zero, 0, platformMask);
 
         while (platformCheck == true)
         {
