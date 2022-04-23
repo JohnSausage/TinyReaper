@@ -16,7 +16,6 @@ public class Parallax : MonoBehaviour
     {
         _parallaxCamera = Camera.main.transform;
 
-        Debug.Log(transform.localPosition);
         _startPos = GetComponentInChildren<Renderer>().bounds.center;
         _localStartPos = transform.localPosition;
     }

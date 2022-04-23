@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class CollectableOrb : MonoBehaviour
 {
@@ -25,11 +26,13 @@ public class CollectableOrb : MonoBehaviour
         GetComponent<AudioSource>().PlayOneShot(GetComponent<AudioSource>().clip);
         GetComponent<SpriteRenderer>().enabled = false;
         GetComponent<Collider2D>().enabled = false;
+        GetComponentInChildren<Light2D>().enabled = false;
     }
 
     public void EnableOrb()
     {
         GetComponent<SpriteRenderer>().enabled = true;
         GetComponent<Collider2D>().enabled = true;
+        GetComponentInChildren<Light2D>().enabled = true;
     }
 }
