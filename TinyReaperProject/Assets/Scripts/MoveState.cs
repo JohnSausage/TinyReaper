@@ -258,7 +258,7 @@ namespace MoveStates
 
         protected bool AnimOver()
         {
-            return _chr.AnimOver();
+            return (_chr.AnimOver() && _timerF > 1);
         }
 
         protected void CheckForShield()
@@ -269,9 +269,47 @@ namespace MoveStates
             }
         }
 
+        protected void AerialMovement()
+        {
+            float nextVelocity = Ctr.OutputVelocity.x;
+            float inputX = Inputs.Direction.x;
+            if (Mathf.Abs(inputX) < 0.25f)
+            {
+                inputX = 0;
+            }
+
+            if (inputX == 0)
+            {
+                if (Mathf.Abs(nextVelocity) <= Vars.aerialDeaccel)
+                {
+                    nextVelocity = 0f;
+                }
+                else
+                {
+                    nextVelocity -= (Vars.aerialDeaccel * Mathf.Sign(nextVelocity));
+                }
+            }
+            else
+            {
+                nextVelocity += inputX * Vars.aerialAccel;
+            }
+
+            nextVelocity = Mathf.Clamp(nextVelocity, -Vars.maxAirspeed, Vars.maxAirspeed);
+
+            SetVelocityX(nextVelocity);
+        }
+
         protected void OnTakeDamage(Damage damage)
         {
             Next(Vars.TakeDamage, 5);
+        }
+
+        protected void CheckForAttacks()
+        {
+            if(Inputs.Attack)
+            {
+                _chr.Attack(Vector2.zero);
+            }
         }
     }
 
@@ -317,6 +355,7 @@ namespace MoveStates
             }
 
             CheckForShield();
+            CheckForAttacks();
             CheckFallThroughPlatform();
             CheckIfAerial();
             CheckForJump();
@@ -355,6 +394,7 @@ namespace MoveStates
 
             CheckForShield();
             CheckForDash();
+            CheckForAttacks();
             CheckFallThroughPlatform();
             CheckIfAerial();
             CheckForJump();
@@ -394,6 +434,7 @@ namespace MoveStates
             }
 
             CheckForShield();
+            CheckForAttacks();
             CheckFallThroughPlatform();
             CheckIfAerial();
             CheckForJump();
@@ -430,6 +471,7 @@ namespace MoveStates
             }
 
             CheckForShield();
+            CheckForAttacks();
             CheckFallThroughPlatform();
             CheckIfAerial();
             CheckForJump();
@@ -651,32 +693,7 @@ namespace MoveStates
             }
             else
             {
-                float nextVelocity = Ctr.OutputVelocity.x;
-                float inputX = Inputs.Direction.x;
-                if (Mathf.Abs(inputX) < 0.25f)
-                {
-                    inputX = 0;
-                }
-
-                if (inputX == 0)
-                {
-                    if (Mathf.Abs(nextVelocity) <= Vars.aerialDeaccel)
-                    {
-                        nextVelocity = 0f;
-                    }
-                    else
-                    {
-                        nextVelocity -= (Vars.aerialDeaccel * Mathf.Sign(nextVelocity));
-                    }
-                }
-                else
-                {
-                    nextVelocity += inputX * Vars.aerialAccel;
-                }
-
-                nextVelocity = Mathf.Clamp(nextVelocity, -Vars.maxAirspeed, Vars.maxAirspeed);
-
-                SetVelocityX(nextVelocity);
+                AerialMovement();
 
 
                 if (_chr.LastState == Vars.WallJumpSquat && _timerF < Vars.wallJumpTimeF)
@@ -718,6 +735,7 @@ namespace MoveStates
                 Next(Vars.AirDodge);
             }
 
+            CheckForAttacks();
             CheckFallThroughPlatform();
             CheckIfLanding();
         }

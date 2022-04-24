@@ -11,8 +11,11 @@ public class Player : Character
     private PlayerInput _playerInput;
 
     private bool oldJump;
+    private bool oldAttack;
     private Vector2 oldDirection;
 
+    private MoveState jab;
+    private MoveState nair;
 
     protected override void Start()
     {
@@ -28,6 +31,10 @@ public class Player : Character
         nextState = MoveStateVars.Idle;
 
         PauseManager.OnPause += OnPause;
+
+
+        jab = new AS_PlayerJab(this);
+        nair = new AS_PlayerNair(this);
     }
 
     protected override void FixedUpdate()
@@ -58,12 +65,20 @@ public class Player : Character
         _movementInputs.Direction = _playerInput.actions["Move"].ReadValue<Vector2>();
         _movementInputs.Jump = _playerInput.actions["Jump"].inProgress;
         _movementInputs.Shield = _playerInput.actions["Shield"].inProgress;
+        _movementInputs.Attack = _playerInput.actions["Attack"].inProgress;
 
         _movementInputs.JumpEvent = false;
 
         if (_movementInputs.Jump == true && oldJump == false)
         {
             _movementInputs.JumpEvent = true;
+        }
+
+        _movementInputs.AttackEvent = false;
+
+        if (_movementInputs.Attack == true && oldAttack == false)
+        {
+            _movementInputs.AttackEvent = true;
         }
 
         Vector2 direction = _movementInputs.Direction;
@@ -82,6 +97,7 @@ public class Player : Character
         _movementInputs.StrongDirection = strongDirection;
 
         oldJump = _movementInputs.Jump;
+        oldAttack = _movementInputs.Attack;
         oldDirection = _movementInputs.Direction;
     }
 
@@ -96,6 +112,20 @@ public class Player : Character
         {
             _playerInput.enabled = true;
             _playerInput.actions.Enable();
+        }
+    }
+
+    public override void Attack(Vector2 direction)
+    {
+        base.Attack(direction);
+
+        if (_movementController.IsGrounded)
+        {
+            SetNextState(jab);
+        }
+        else
+        {
+            SetNextState(nair);
         }
     }
 }

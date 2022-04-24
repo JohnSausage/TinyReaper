@@ -6,6 +6,7 @@ using MoveStates;
 public class PlayerAnimationEvents : MonoBehaviour
 {
     [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private ParticleSystem _dustStepParticles;
 
     [Space]
 
@@ -26,6 +27,7 @@ public class PlayerAnimationEvents : MonoBehaviour
     private void Step()
     {
         _step.PlayFrom(_audioSource);
+        _dustStepParticles.Play();
     }
 
     private void Land(MoveState moveState)

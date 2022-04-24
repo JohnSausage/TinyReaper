@@ -11,4 +11,7 @@ public class MovementInputs
     public bool JumpEvent { get; set; }
 
     public bool Shield { get; set; }
+
+    public bool Attack{ get; set; }
+    public bool AttackEvent { get; set; }
 }

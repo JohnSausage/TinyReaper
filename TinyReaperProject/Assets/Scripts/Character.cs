@@ -110,4 +110,9 @@ public class Character : MonoBehaviour, ICanTakeDamage, ICanBeTransported
     {
         _movementController.TransportOnPlatform(movement);
     }
+
+    public virtual void Attack(Vector2 direction)
+    {
+
+    }
 }

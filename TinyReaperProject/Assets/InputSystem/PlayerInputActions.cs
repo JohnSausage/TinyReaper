@@ -53,6 +53,15 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Attack"",
+                    ""type"": ""Button"",
+                    ""id"": ""869abd54-9877-4710-8f44-fa619efcbd41"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -187,6 +196,28 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                     ""action"": ""Shield"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7a88c78b-5359-44c0-a7a8-a7b2b50e3919"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6a6d59c7-63fc-4df1-b216-663581a3bbe5"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Attack"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -198,6 +229,7 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         m_PlayerMovement_Move = m_PlayerMovement.FindAction("Move", throwIfNotFound: true);
         m_PlayerMovement_Jump = m_PlayerMovement.FindAction("Jump", throwIfNotFound: true);
         m_PlayerMovement_Shield = m_PlayerMovement.FindAction("Shield", throwIfNotFound: true);
+        m_PlayerMovement_Attack = m_PlayerMovement.FindAction("Attack", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -260,6 +292,7 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
     private readonly InputAction m_PlayerMovement_Move;
     private readonly InputAction m_PlayerMovement_Jump;
     private readonly InputAction m_PlayerMovement_Shield;
+    private readonly InputAction m_PlayerMovement_Attack;
     public struct PlayerMovementActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -267,6 +300,7 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         public InputAction @Move => m_Wrapper.m_PlayerMovement_Move;
         public InputAction @Jump => m_Wrapper.m_PlayerMovement_Jump;
         public InputAction @Shield => m_Wrapper.m_PlayerMovement_Shield;
+        public InputAction @Attack => m_Wrapper.m_PlayerMovement_Attack;
         public InputActionMap Get() { return m_Wrapper.m_PlayerMovement; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -285,6 +319,9 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                 @Shield.started -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnShield;
                 @Shield.performed -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnShield;
                 @Shield.canceled -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnShield;
+                @Attack.started -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnAttack;
+                @Attack.performed -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnAttack;
+                @Attack.canceled -= m_Wrapper.m_PlayerMovementActionsCallbackInterface.OnAttack;
             }
             m_Wrapper.m_PlayerMovementActionsCallbackInterface = instance;
             if (instance != null)
@@ -298,6 +335,9 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                 @Shield.started += instance.OnShield;
                 @Shield.performed += instance.OnShield;
                 @Shield.canceled += instance.OnShield;
+                @Attack.started += instance.OnAttack;
+                @Attack.performed += instance.OnAttack;
+                @Attack.canceled += instance.OnAttack;
             }
         }
     }
@@ -307,5 +347,6 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnShield(InputAction.CallbackContext context);
+        void OnAttack(InputAction.CallbackContext context);
     }
 }
